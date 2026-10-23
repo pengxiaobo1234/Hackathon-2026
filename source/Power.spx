@@ -1,0 +1,3 @@
+onMsg "render", => {
+    if PowerActive && Mode != 0 { show; setXYpos PowerX*0.5, (PowerY-140)*0.5; setCostume PowerKind } else { hide }
+}

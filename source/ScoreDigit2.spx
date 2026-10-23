@@ -1,0 +1,3 @@
+onMsg "render", => {
+    if Mode != 0 { show; setCostume ((Score)/1000)%10 } else { hide }
+}

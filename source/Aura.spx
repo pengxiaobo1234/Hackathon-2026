@@ -1,0 +1,3 @@
+onMsg "render", => {
+    if ShieldTime > 0 && Mode != 0 { show; setXYpos -140, (-90+Height)*0.5 } else { hide }
+}

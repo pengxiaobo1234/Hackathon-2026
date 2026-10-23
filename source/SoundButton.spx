@@ -1,0 +1,2 @@
+onClick => { SoundOn = !SoundOn }
+onMsg "render", => { if SoundOn { setCostume 0 } else { setCostume 1 } }

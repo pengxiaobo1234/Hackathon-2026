@@ -1,0 +1,7 @@
+onMsg "render", => {
+    if Mode != 0 {
+        if Invincible > 0 && int(Clock*14)%2 == 0 && Mode == 1 { hide } else { show }
+        setXYpos -140, (-140+Height)*0.5
+        if SlideTime > 0 { setCostume 7 } else if Height > 3 { setCostume 6 } else { setCostume int(Clock*12)%6 }
+    } else { hide }
+}

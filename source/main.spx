@@ -1,0 +1,301 @@
+// 星轨疾跑 · XBuilder / spx 3.3 原生项目
+// 设计坐标：跑者固定 x=-280，地面脚底 y=-140。所有物理量使用秒。
+// XBuilder 固定视口为 480x360；所有角色渲染位置与大小统一为设计值的 0.5 倍。
+// 状态：0 首页，1 奔跑，2 暂停，3 结算。纯逻辑方法可独立自动测试。
+import "math"
+
+var (
+    Mode int
+    Score int
+    Coins int
+    Distance float64
+    Best int
+    Lives int
+    Height float64
+    JumpVelocity float64
+    Jumps int
+    SlideTime float64
+    ShieldTime float64
+    MagnetTime float64
+    Invincible float64
+    Speed float64
+    Clock float64
+    Scroll float64
+    SpawnTime float64
+    PowerTime float64
+    Seed int
+    SoundOn bool
+    SoundEvent int
+    ObX [4]float64
+    ObKind [4]int
+    ObActive [4]bool
+    CoinX [24]float64
+    CoinY [24]float64
+    CoinActive [24]bool
+    PowerX float64
+    PowerY float64
+    PowerKind int
+    PowerActive bool
+    JumpHeld bool
+    SlideHeld bool
+    PauseHeld bool
+    StartHeld bool
+    MuteHeld bool
+)
+
+func RandomInt(n int) int {
+    Seed = (Seed * 48271) % 2147483647
+    return Seed % n
+}
+
+func StartRun() {
+    Mode = 1
+    Score = 0
+    Coins = 0
+    Distance = 0
+    Lives = 3
+    Height = 0
+    JumpVelocity = 0
+    Jumps = 0
+    SlideTime = 0
+    ShieldTime = 0
+    MagnetTime = 0
+    Invincible = 1.5
+    Speed = 300
+    Clock = 0
+    Scroll = 0
+    SpawnTime = 2.4
+    PowerTime = 7
+    PowerActive = false
+    SoundEvent = 0
+    for i := 0; i < 4; i++ { ObActive[i] = false }
+    for i := 0; i < 24; i++ { CoinActive[i] = false }
+}
+
+func JumpAction() {
+    if Mode != 1 { return }
+    if Jumps < 2 && Height > -45 {
+        JumpVelocity = 610
+        Jumps++
+        SlideTime = 0
+        SoundEvent = 1
+    }
+}
+
+func SlideAction() {
+    if Mode != 1 { return }
+    if Height <= 2 && Height >= 0 {
+        SlideTime = 0.8
+    } else if Height > 2 {
+        JumpVelocity = -750
+    }
+}
+
+func PauseAction() {
+    if Mode == 1 { Mode = 2 } else if Mode == 2 { Mode = 1 }
+}
+
+func FinishRun() {
+    Mode = 3
+    if Score > Best { Best = Score }
+    SoundEvent = 4
+}
+
+func Hit() {
+    if Mode != 1 || Invincible > 0 { return }
+    if ShieldTime > 0 {
+        ShieldTime = 0
+        Invincible = 1
+        SoundEvent = 3
+        return
+    }
+    Lives--
+    Invincible = 1.8
+    SoundEvent = 3
+    if Lives <= 0 { FinishRun() }
+}
+
+func AddCoin(x float64, y float64) {
+    for i := 0; i < 24; i++ {
+        if !CoinActive[i] {
+            CoinActive[i] = true
+            CoinX[i] = x
+            CoinY[i] = y
+            return
+        }
+    }
+}
+
+func SpawnObstacle() {
+    for i := 0; i < 4; i++ {
+        if !ObActive[i] {
+            ObActive[i] = true
+            ObX[i] = 570
+            kind := RandomInt(4)
+            // 前 20 秒先学习跳跃和下滑，再引入高障碍及断桥。
+            if Clock < 20 { kind = RandomInt(2) * 2 }
+            ObKind[i] = kind
+            for j := 0; j < 5; j++ {
+                h := 46.0
+                if kind == 1 { h = 160 }
+                if kind == 2 { h = 25 }
+                if kind == 3 { h = 95 }
+                if kind != 2 { h += 22 * math.Sin(float64(j) * math.Pi / 4) }
+                AddCoin(450 + float64(j)*55, h)
+            }
+            return
+        }
+    }
+}
+
+func Tick(dt float64) {
+    if Mode != 1 { return }
+    if dt <= 0 { return }
+    if dt > 0.05 { dt = 0.05 }
+    // 小步积分减少低帧率穿透；暂停不会积累时间。
+    remaining := dt
+    for remaining > 0 && Mode == 1 {
+        step := math.Min(remaining, 1.0/120)
+        Simulate(step)
+        remaining -= step
+    }
+}
+
+func Simulate(dt float64) {
+    Clock += dt
+    Speed = math.Min(480, 300 + Clock*2)
+    Distance += Speed * dt / 35
+    Scroll += Speed * dt
+    Score = int(Distance)*10 + Coins*50
+    if Score > Best { Best = Score }
+    SlideTime = math.Max(0, SlideTime-dt)
+    ShieldTime = math.Max(0, ShieldTime-dt)
+    MagnetTime = math.Max(0, MagnetTime-dt)
+    Invincible = math.Max(0, Invincible-dt)
+    SpawnTime -= dt
+    if SpawnTime <= 0 {
+        SpawnObstacle()
+        SpawnTime = 1.65 + float64(RandomInt(65))/100
+    }
+    PowerTime -= dt
+    if PowerTime <= 0 && !PowerActive {
+        PowerX = 580
+        PowerY = 72
+        PowerKind = RandomInt(2)
+        PowerActive = true
+        PowerTime = 11 + float64(RandomInt(5))
+    }
+    gap := false
+    for i := 0; i < 4; i++ {
+        if ObActive[i] {
+            ObX[i] -= Speed*dt
+            if ObX[i] < -620 { ObActive[i] = false }
+            dx := math.Abs(ObX[i]+280)
+            if ObKind[i] == 3 && dx < 76 { gap = true }
+            if ObKind[i] != 3 && dx < 43 {
+                top := Height + 68
+                if SlideTime > 0 { top = Height + 30 }
+                collide := false
+                if ObKind[i] == 0 { collide = Height < 51 && top > 0 }
+                if ObKind[i] == 1 { collide = Height < 101 && top > 0 }
+                if ObKind[i] == 2 { collide = top > 53 && Height < 95 }
+                if collide && Invincible <= 0 {
+                    Hit()
+                    ObActive[i] = false
+                }
+            }
+        }
+    }
+    if Height > 0 || JumpVelocity != 0 || gap || Height < 0 {
+        JumpVelocity -= 1650*dt
+        Height += JumpVelocity*dt
+    }
+    if Height <= 0 && !gap && Height > -35 {
+        Height = 0
+        JumpVelocity = 0
+        Jumps = 0
+    }
+    if Height < -100 {
+        // 断桥消耗一次生命并救回跑道，护盾同样可抵挡。
+        Invincible = 0
+        Hit()
+        Height = 0
+        JumpVelocity = 0
+        Jumps = 0
+        Invincible = 2
+        for i := 0; i < 4; i++ {
+            if ObActive[i] && ObKind[i] == 3 && math.Abs(ObX[i]+280) < 200 { ObActive[i] = false }
+        }
+    }
+    playerCenter := Height + 38
+    if SlideTime > 0 { playerCenter = Height + 18 }
+    for i := 0; i < 24; i++ {
+        if CoinActive[i] {
+            CoinX[i] -= Speed*dt
+            dx := -280 - CoinX[i]
+            dy := playerCenter - CoinY[i]
+            if MagnetTime > 0 && dx*dx+dy*dy < 240*240 {
+                CoinX[i] += dx*math.Min(1, dt*9)
+                CoinY[i] += dy*math.Min(1, dt*9)
+                dx = -280-CoinX[i]
+                dy = playerCenter-CoinY[i]
+            }
+            if dx*dx+dy*dy < 39*39 {
+                CoinActive[i] = false
+                Coins++
+                Score = int(Distance)*10+Coins*50
+                SoundEvent = 2
+            }
+            if CoinX[i] < -530 { CoinActive[i] = false }
+        }
+    }
+    if PowerActive {
+        PowerX -= Speed*dt
+        if math.Abs(PowerX+280) < 45 && math.Abs(PowerY-playerCenter) < 55 {
+            PowerActive = false
+            if PowerKind == 0 { ShieldTime = 9 } else { MagnetTime = 9 }
+            SoundEvent = 5
+        }
+        if PowerX < -550 { PowerActive = false }
+    }
+    if Score > Best { Best = Score }
+}
+
+// 所有输入在同一循环中按上升沿响应，按住空格不会自动消耗二段跳。
+onStart => {
+    Mode = 0
+    Best = 0
+    Seed = 20261023
+    SoundOn = true
+    Lives = 3
+    for {
+        dt := waitNextFrame()
+        jump := keyPressed(KeySpace) || keyPressed(KeyUp) || keyPressed(KeyW)
+        slide := keyPressed(KeyDown) || keyPressed(KeyS)
+        pause := keyPressed(KeyP) || keyPressed(KeyEscape)
+        start := keyPressed(KeyEnter)
+        mute := keyPressed(KeyM)
+        if start && !StartHeld {
+            if Mode == 0 || Mode == 3 { StartRun() } else if Mode == 2 { PauseAction() }
+        }
+        if pause && !PauseHeld { PauseAction() }
+        if jump && !JumpHeld { JumpAction() }
+        if slide && !SlideHeld { SlideAction() }
+        if mute && !MuteHeld { SoundOn = !SoundOn }
+        JumpHeld = jump
+        SlideHeld = slide
+        PauseHeld = pause
+        StartHeld = start
+        MuteHeld = mute
+        Tick(dt)
+        if SoundOn && SoundEvent > 0 {
+            if SoundEvent == 1 { play "jump" }
+            if SoundEvent == 2 { play "coin" }
+            if SoundEvent == 3 { play "hit" }
+            if SoundEvent == 4 { play "over" }
+            if SoundEvent == 5 { play "power" }
+        }
+        SoundEvent = 0
+        broadcastAndWait "render"
+    }
+}

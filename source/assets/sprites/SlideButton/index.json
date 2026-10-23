@@ -1,0 +1,24 @@
+{
+  "heading": 90,
+  "x": 120.0,
+  "y": -103.0,
+  "size": 0.5,
+  "rotationStyle": "none",
+  "physicsMode": "no",
+  "costumeIndex": 0,
+  "visible": false,
+  "isDraggable": false,
+  "collisionShapeType": "none",
+  "costumes": [
+    {
+      "name": "frame0",
+      "path": "0.png",
+      "x": 55.0,
+      "y": 35.0,
+      "faceRight": 0,
+      "bitmapResolution": 1,
+      "imageWidth": 110,
+      "imageHeight": 70
+    }
+  ]
+}

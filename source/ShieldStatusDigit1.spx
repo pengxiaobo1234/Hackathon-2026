@@ -1,0 +1,3 @@
+onMsg "render", => {
+    if ShieldTime > 0 && Mode != 0 { show; setCostume ((int(ShieldTime)+1)/1)%10 } else { hide }
+}

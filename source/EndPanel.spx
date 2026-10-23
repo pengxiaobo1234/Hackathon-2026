@@ -1,0 +1,1 @@
+onMsg "render", => { if Mode == 3 { show } else { hide } }
