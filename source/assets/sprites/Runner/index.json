@@ -1,0 +1,94 @@
+{
+  "heading": 90,
+  "x": -140.0,
+  "y": -70.0,
+  "size": 0.5,
+  "rotationStyle": "none",
+  "physicsMode": "no",
+  "costumeIndex": 0,
+  "visible": false,
+  "isDraggable": false,
+  "collisionShapeType": "none",
+  "costumes": [
+    {
+      "name": "frame0",
+      "path": "0.png",
+      "x": 46,
+      "y": 100,
+      "faceRight": 0,
+      "bitmapResolution": 1,
+      "imageWidth": 92,
+      "imageHeight": 106
+    },
+    {
+      "name": "frame1",
+      "path": "1.png",
+      "x": 46,
+      "y": 100,
+      "faceRight": 0,
+      "bitmapResolution": 1,
+      "imageWidth": 92,
+      "imageHeight": 106
+    },
+    {
+      "name": "frame2",
+      "path": "2.png",
+      "x": 46,
+      "y": 100,
+      "faceRight": 0,
+      "bitmapResolution": 1,
+      "imageWidth": 92,
+      "imageHeight": 106
+    },
+    {
+      "name": "frame3",
+      "path": "3.png",
+      "x": 46,
+      "y": 100,
+      "faceRight": 0,
+      "bitmapResolution": 1,
+      "imageWidth": 92,
+      "imageHeight": 106
+    },
+    {
+      "name": "frame4",
+      "path": "4.png",
+      "x": 46,
+      "y": 100,
+      "faceRight": 0,
+      "bitmapResolution": 1,
+      "imageWidth": 92,
+      "imageHeight": 106
+    },
+    {
+      "name": "frame5",
+      "path": "5.png",
+      "x": 46,
+      "y": 100,
+      "faceRight": 0,
+      "bitmapResolution": 1,
+      "imageWidth": 92,
+      "imageHeight": 106
+    },
+    {
+      "name": "frame6",
+      "path": "6.png",
+      "x": 46,
+      "y": 100,
+      "faceRight": 0,
+      "bitmapResolution": 1,
+      "imageWidth": 92,
+      "imageHeight": 106
+    },
+    {
+      "name": "frame7",
+      "path": "7.png",
+      "x": 46,
+      "y": 100,
+      "faceRight": 0,
+      "bitmapResolution": 1,
+      "imageWidth": 92,
+      "imageHeight": 106
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+onMsg "render", => {
+    if Mode != 0 { show; setCostume ((int(Distance))/10)%10 } else { hide }
+}

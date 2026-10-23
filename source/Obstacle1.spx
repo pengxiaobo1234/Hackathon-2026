@@ -1,0 +1,7 @@
+onMsg "render", => {
+    if ObActive[1] && Mode != 0 {
+        show
+        setXYpos ObX[1]*0.5, -70
+        setCostume ObKind[1]
+    } else { hide }
+}

@@ -1,0 +1,2 @@
+onClick => { if Mode == 2 { PauseAction() } }
+onMsg "render", => { if Mode == 2 { show } else { hide } }

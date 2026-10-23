@@ -1,0 +1,34 @@
+{
+  "heading": 90,
+  "x": -199.5,
+  "y": 62.5,
+  "size": 0.5,
+  "rotationStyle": "none",
+  "physicsMode": "no",
+  "costumeIndex": 0,
+  "visible": true,
+  "isDraggable": false,
+  "collisionShapeType": "none",
+  "costumes": [
+    {
+      "name": "frame0",
+      "path": "0.png",
+      "x": 43.0,
+      "y": 16.0,
+      "faceRight": 0,
+      "bitmapResolution": 1,
+      "imageWidth": 86,
+      "imageHeight": 32
+    },
+    {
+      "name": "frame1",
+      "path": "1.png",
+      "x": 43.0,
+      "y": 16.0,
+      "faceRight": 0,
+      "bitmapResolution": 1,
+      "imageWidth": 86,
+      "imageHeight": 32
+    }
+  ]
+}

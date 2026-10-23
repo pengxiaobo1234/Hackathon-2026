@@ -1,0 +1,3 @@
+onMsg "render", => {
+    if Mode == 3 { show; setCostume ((Coins)/10)%10 } else { hide }
+}

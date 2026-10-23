@@ -1,0 +1,4 @@
+import "math"
+onMsg "render", => {
+    setXYpos (960 - math.Mod(Scroll*0.2,960))*0.5, -41.25
+}

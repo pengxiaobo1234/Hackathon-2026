@@ -1,0 +1,6 @@
+onMsg "render", => {
+    if CoinActive[4] && Mode != 0 {
+        show
+        setXYpos CoinX[4]*0.5, (CoinY[4]-140)*0.5
+    } else { hide }
+}
